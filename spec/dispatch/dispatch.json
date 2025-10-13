@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "offset": 0,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@minichat/add-writer",
+      "requestType": "@minichat/writers",
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@minichat/add-invite",
+      "requestType": "@minichat/invites",
+      "version": 1
+    },
+    {
+      "id": 2,
+      "name": "@minichat/del-invite",
+      "requestType": "@minichat/invites",
+      "version": 1
+    },
+    {
+      "id": 3,
+      "name": "@minichat/add-user",
+      "requestType": "@minichat/users",
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@minichat/del-user",
+      "requestType": "@minichat/users",
+      "version": 1
+    },
+    {
+      "id": 5,
+      "name": "@minichat/add-message",
+      "requestType": "@minichat/messages",
+      "version": 1
+    },
+    {
+      "id": 6,
+      "name": "@minichat/del-message",
+      "requestType": "@minichat/messages",
+      "version": 1
+    },
+    {
+      "id": 7,
+      "name": "@minichat/add-event",
+      "requestType": "@minichat/events",
+      "version": 1
+    },
+    {
+      "id": 8,
+      "name": "@minichat/del-event",
+      "requestType": "@minichat/events",
+      "version": 1
+    }
+  ]
+}

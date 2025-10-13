@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "name": "writers",
+      "namespace": "minichat",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "invites",
+      "namespace": "minichat",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "invite",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "publicKey",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "expires",
+          "required": true,
+          "type": "int",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "namespace": "minichat",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "info",
+          "type": "json",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "messages",
+      "namespace": "minichat",
+      "compact": false,
+      "flagsPosition": 2,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "text",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "info",
+          "type": "json",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "events",
+      "namespace": "minichat",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

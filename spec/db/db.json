@@ -1,0 +1,58 @@
+{
+  "version": 0,
+  "offset": 0,
+  "schema": [
+    {
+      "name": "writers",
+      "namespace": "minichat",
+      "id": 0,
+      "type": 1,
+      "indexes": [],
+      "schema": "@minichat/writers",
+      "derived": false,
+      "key": [
+        "key"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "invites",
+      "namespace": "minichat",
+      "id": 1,
+      "type": 1,
+      "indexes": [],
+      "schema": "@minichat/invites",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "users",
+      "namespace": "minichat",
+      "id": 2,
+      "type": 1,
+      "indexes": [],
+      "schema": "@minichat/users",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "messages",
+      "namespace": "minichat",
+      "id": 3,
+      "type": 1,
+      "indexes": [],
+      "schema": "@minichat/messages",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
+    }
+  ]
+}
