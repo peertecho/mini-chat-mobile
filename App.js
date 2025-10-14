@@ -6,7 +6,7 @@ import { setStringAsync } from 'expo-clipboard'
 import useWorklet from './hooks/use-workket'
 
 export default function App () {
-  const { ready, addMessage, reset, invite, messages, error } = useWorklet()
+  const { ready, addMessage, reset, clearError, invite, messages, error } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -92,7 +92,14 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        {error && <Text style={styles.title}>{error}</Text>}
+        {error && (
+          <>
+            <Text style={styles.title}>{error}</Text>
+            <TouchableOpacity style={styles.resetButton} onPress={() => clearError()}>
+              <Text style={styles.resetText}>Clear</Text>
+            </TouchableOpacity>
+          </>
+        )}
         {roomReady ? renderChatRoom() : renderSetupRoom()}
       </View>
     </TouchableWithoutFeedback>

@@ -24,10 +24,8 @@ const useWorklet = () => {
         const obj = JSON.parse(msg)
         if (obj.tag === 'invite') {
           setInvite(obj.data)
-          setError('')
         } else if (obj.tag === 'messages') {
           setMessages(obj.data)
-          setError('')
         } else if (obj.tag === 'error') {
           setError(obj.data)
         } else if (obj.tag === 'log') {
@@ -49,6 +47,7 @@ const useWorklet = () => {
     ready: (invite) => write('ready', { documentDir: Paths.document.uri.substring('file://'.length), invite }),
     addMessage: (message) => write('add-message', message),
     reset: () => write('reset'),
+    clearError: () => setError(''),
     invite,
     messages,
     error
