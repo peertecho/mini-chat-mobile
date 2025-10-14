@@ -30,6 +30,8 @@ const useWorklet = () => {
           setError('')
         } else if (obj.tag === 'error') {
           setError(obj.data)
+        } else if (obj.tag === 'log') {
+          console.log(obj.data)
         }
       }
     })
@@ -46,6 +48,7 @@ const useWorklet = () => {
   return {
     ready: (invite) => write('ready', { documentDir: Paths.document.uri.substring('file://'.length), invite }),
     addMessage: (message) => write('add-message', message),
+    reset: () => write('reset'),
     invite,
     messages,
     error

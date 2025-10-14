@@ -6,7 +6,7 @@ import { setStringAsync } from 'expo-clipboard'
 import useWorklet from './hooks/use-workket'
 
 export default function App () {
-  const { ready, addMessage, invite, messages, error } = useWorklet()
+  const { ready, addMessage, reset, invite, messages, error } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
@@ -25,6 +25,10 @@ export default function App () {
   const onSend = () => {
     addMessage(input)
     setInput('')
+  }
+
+  const onReset = () => {
+    reset()
   }
 
   const renderSetupRoom = () => (
@@ -59,9 +63,14 @@ export default function App () {
   const renderChatRoom = () => (
     <>
       <Text>Invite: {invite}</Text>
-      <TouchableOpacity style={styles.copyButton} onPress={() => setStringAsync(invite)}>
-        <Text style={styles.copyText}>Copy Invite</Text>
-      </TouchableOpacity>
+      <View style={styles.inviteActionRow}>
+        <TouchableOpacity style={styles.copyButton} onPress={() => setStringAsync(invite)}>
+          <Text style={styles.copyText}>Copy Invite</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.resetButton} onPress={() => onReset()}>
+          <Text style={styles.resetText}>Reset</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
@@ -135,15 +144,29 @@ const styles = StyleSheet.create({
     padding: 8,
     marginRight: 8
   },
+  inviteActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16
+  },
   copyButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: '#007AFF',
-    marginTop: 8,
-    marginBottom: 16
   },
   copyText: {
     color: '#fff'
+  },
+  resetButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: 'red',
+    marginLeft: 8
+  },
+  resetText: {
+    color: '#fff',
+    fontWeight: 'bold'
   },
   title: {
     fontSize: 20,

@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 const process = require('process')
+const fs = require('fs').promises
 const path = require('path')
 const goodbye = require('graceful-goodbye')
 const { IPC } = BareKit
@@ -65,6 +66,11 @@ async function onData (obj) {
   } else if (obj.tag === 'add-message') {
     const id = Math.random().toString(16).slice(2)
     await room.addMessage(id, obj.data, { at: new Date().toISOString() })
+  } else if (obj.tag === 'reset') {
+    write('invite', '')
+    const storage = room.storage
+    await room.close()
+    await fs.rmdir(storage, { recursive: true })
   }
 }
 
