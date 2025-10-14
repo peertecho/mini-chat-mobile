@@ -18,6 +18,8 @@ process.on('unhandledRejection', (err) => {
   IPC.end()
 })
 
+IPC.on('error', (err) => onError(err))
+IPC.on('close', () => onClose())
 IPC.on('data', async (data) => {
   try {
     const lines = data.toString().split('\n')
@@ -36,15 +38,17 @@ IPC.on('data', async (data) => {
     write({ tag: 'error', data: `${err?.stack || err}` })
   }
 })
-IPC.on('error', async () => {
-  await room?.close()
-})
-IPC.on('close', async () => {
-  await room?.close()
-})
 
 function write (data) {
   IPC.write(Buffer.from(JSON.stringify({ tag: 'data', data }) + '\n'))
+}
+
+async function onError(err) {
+  await room?.close()
+}
+
+async function onClose() {
+  await room?.close()
 }
 
 async function onData (obj) {
