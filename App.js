@@ -1,56 +1,29 @@
-/* eslint-disable react/jsx-handler-names */
-import { useEffect, useState } from 'react'
+/* eslint-disable no-undef, react/jsx-handler-names */
+import { useState } from 'react'
 import { StyleSheet, Text, View, TextInput, Button, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import { Paths } from 'expo-file-system'
 import { setStringAsync } from 'expo-clipboard'
 
 import useWorklet from './hooks/use-workket'
 
 export default function App () {
-  const { worklet, data } = useWorklet()
+  const { ready, addMessage, invite, messages, error } = useWorklet()
 
   const [mode, setMode] = useState('create')
   const [joinInvite, setJoinInvite] = useState('')
-
-  const [invite, setInvite] = useState('')
-  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
 
   const roomReady = !!invite
-
-  useEffect(() => {
-    if (!roomReady) return
-
-    const interval = setInterval(() => {
-      worklet?.write({ tag: 'get-messages' })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [roomReady])
-
-  useEffect(() => {
-    if (data.tag === 'invite') {
-      setInvite(data.data)
-    } else if (data.tag === 'messages') {
-      setMessages(data.data)
-    } else if (data.tag === 'log') {
-      console.log(data.data)
-    }
-  }, [data])
 
   const onRoomCTA = () => {
     if (mode === 'join' && !joinInvite) {
       alert('Please type invite to join room')
       return
     }
-    const data = {
-      documentDir: Paths.document.uri.substring('file://'.length),
-      invite: joinInvite
-    }
-    worklet?.write({ tag: 'ready', data })
+    ready(mode === 'join' ? joinInvite : undefined)
   }
 
   const onSend = () => {
-    worklet?.write({ tag: 'add-message', data: input })
+    addMessage(input)
     setInput('')
   }
 
@@ -110,6 +83,7 @@ export default function App () {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
+        {error && <Text style={styles.title}>{error}</Text>}
         {roomReady ? renderChatRoom() : renderSetupRoom()}
       </View>
     </TouchableWithoutFeedback>

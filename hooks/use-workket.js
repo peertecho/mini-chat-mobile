@@ -1,29 +1,59 @@
-import { useEffect, useState } from 'react'
+import b4a from 'b4a'
+import { useState, useEffect } from 'react'
+import { Worklet } from 'react-native-bare-kit'
+import { Paths } from 'expo-file-system'
 
-import runWorklet from '../lib/run-worklet'
+import bundle from '../worklet/app.bundle.mjs'
+
+const worklet = new Worklet()
+worklet.start('/app.bundle', bundle)
+const { IPC } = worklet
 
 const useWorklet = () => {
-  const [worklet, setWorklet] = useState(null)
-  const [data, setData] = useState({})
+  const [invite, setInvite] = useState('')
+  const [messages, setMessages] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const worklet = runWorklet({
-      onData: (data) => {
-        setData(data)
-      },
-      onError: (error) => {
-        console.error('Worklet.onError', error)
-        worklet.close()
-      },
-      onClose: () => {
-        console.log('Worklet.onClose')
+    IPC.on('data', (data) => {
+      const lines = b4a.toString(data).split('\n')
+      for (let msg of lines) {
+        msg = msg.trim()
+        if (!msg) continue
+
+        const obj = JSON.parse(msg)
+        if (obj.tag === 'invite') {
+          setInvite(obj.data)
+          setError('')
+        } else if (obj.tag === 'messages') {
+          setMessages(obj.data)
+          setError('')
+        } else if (obj.tag === 'error') {
+          setError(obj.data)
+        }
       }
     })
-    setWorklet(worklet)
-    return () => worklet.close()
+    return () => IPC.end()
   }, [])
 
-  return { worklet, data }
+  useEffect(() => {
+    if (!invite) return
+
+    const interval = setInterval(() => write('get-messages', { noLog: true }), 1000)
+    return () => clearInterval(interval)
+  }, [invite])
+
+  return {
+    ready: (invite) => write('ready', { documentDir: Paths.document.uri.substring('file://'.length), invite }),
+    addMessage: (message) => write('add-message', message),
+    invite,
+    messages,
+    error
+  }
+}
+
+function write (tag, data) {
+  IPC.write(b4a.from(JSON.stringify({ tag, data }) + '\n'))
 }
 
 export default useWorklet

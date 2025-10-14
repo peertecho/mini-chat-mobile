@@ -10,49 +10,37 @@ const MiniChatRoom = require('./mini-chat-room')
 let room
 
 process.on('uncaughtException', (err) => {
-  write({ tag: 'error', data: `${err?.stack || err}` })
+  write('error', `${err?.stack || err}`)
   IPC.end()
 })
 process.on('unhandledRejection', (err) => {
-  write({ tag: 'error', data: `${err?.stack || err}` })
+  write('error', `${err?.stack || err}`)
   IPC.end()
 })
 
 IPC.on('error', (err) => onError(err))
 IPC.on('close', () => onClose())
 IPC.on('data', async (data) => {
-  try {
-    const lines = data.toString().split('\n')
-    for (let msg of lines) {
-      msg = msg.trim()
-      if (!msg) continue
-      const obj = parseMsg(msg)
+  const lines = data.toString().split('\n')
+  for (let msg of lines) {
+    msg = msg.trim()
+    if (!msg) continue
 
-      if (obj.tag === 'data') {
-        await onData(obj.data, obj)
-      } else {
-        write({ tag: 'error', data: `Unknown message ${msg}` })
-      }
-    }
-  } catch (err) {
-    write({ tag: 'error', data: `${err?.stack || err}` })
+    const obj = JSON.parse(msg)
+    await onData(obj)
   }
 })
 
-function write (data) {
-  IPC.write(Buffer.from(JSON.stringify({ tag: 'data', data }) + '\n'))
-}
-
-async function onError(err) {
+async function onError () {
   await room?.close()
 }
 
-async function onClose() {
+async function onClose () {
   await room?.close()
 }
 
 async function onData (obj) {
-  if (obj.tag !== 'get-messages') write({ tag: 'log', data: obj })
+  if (!obj.data?.noLog) write('log', obj)
 
   if (obj.tag === 'ready') {
     const { documentDir, invite } = obj.data
@@ -60,34 +48,26 @@ async function onData (obj) {
     room = new MiniChatRoom({ storage, invite })
     goodbye(() => room.close())
     await room.ready()
-    write({ tag: 'invite', data: invite || await room.createInvite() })
+
+    write('invite', invite || await room.createInvite())
     return
   }
 
   if (!room) {
-    write({ tag: 'error', data: 'Room not found' })
+    write('error', 'Room not found')
     return
   }
   await room.ready()
 
-  if (obj.tag === 'get-invite') {
-    const invite = await room.createInvite()
-    write({ tag: 'invite', data: invite })
-  } else if (obj.tag === 'get-messages') {
+  if (obj.tag === 'get-messages') {
     const messages = await room.getMessages()
-    write({ tag: 'messages', data: messages })
+    write('messages', messages)
   } else if (obj.tag === 'add-message') {
     const id = Math.random().toString(16).slice(2)
     await room.addMessage(id, obj.data, { at: new Date().toISOString() })
-  } else {
-    write({ tag: 'error', data: `Unknown command ${JSON.stringify(obj)}` })
   }
 }
 
-function parseMsg (msg) {
-  try {
-    return JSON.parse(msg)
-  } catch {
-    return { tag: 'unknown', data: msg }
-  }
+function write (tag, data) {
+  IPC.write(Buffer.from(JSON.stringify({ tag, data }) + '\n'))
 }
