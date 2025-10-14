@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.mobilereactminimal"
+      "package": "com.anonymous.minichat"
     },
     "plugins": [
       [
