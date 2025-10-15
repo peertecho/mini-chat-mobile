@@ -70,7 +70,7 @@ async function onData (obj) {
     write('invite', '')
     const storage = room.storage
     await room.close()
-    await fs.rmdir(storage, { recursive: true })
+    await fs.rm(storage, { recursive: true, force: true })
   }
 }
 
