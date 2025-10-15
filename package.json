@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "ROOT=$(git rev-parse --show-toplevel); watchman watch-del $ROOT; watchman watch-project $ROOT",
+    "db:gen": "node schema.js",
     "build:worklet": "./scripts/build-worklet.sh",
     "build:worklet:watch": "nodemon --watch worklet --ext js,cjs --exec npm run build:worklet",
     "start": "npm run build:worklet && expo start -d",
