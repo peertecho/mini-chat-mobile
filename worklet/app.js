@@ -28,7 +28,7 @@ IPC.on('data', async (data) => {
     if (!msg) continue
 
     const obj = JSON.parse(msg)
-    await onData(obj)
+    await onData(obj).catch(err => write('error', `${err?.stack || err}`))
   }
 })
 
