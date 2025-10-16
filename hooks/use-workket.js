@@ -10,7 +10,7 @@ worklet.start('/app.bundle', bundle)
 const { IPC } = worklet
 
 const useWorklet = () => {
-  const [invite, setInvite] = useState('')
+  const [invite, setInvite] = useState()
   const [messages, setMessages] = useState([])
   const [error, setError] = useState('')
 
@@ -22,7 +22,9 @@ const useWorklet = () => {
         if (!msg) continue
 
         const obj = JSON.parse(msg)
-        if (obj.tag === 'invite') {
+        if (obj.tag === 'resumed') {
+          setInvite(obj.data)
+        } else if (obj.tag === 'invite') {
           setInvite(obj.data)
         } else if (obj.tag === 'messages') {
           setMessages(obj.data)
@@ -33,6 +35,7 @@ const useWorklet = () => {
         }
       }
     })
+    write('resume', Paths.document.uri.substring('file://'.length))
     return () => IPC.end()
   }, [])
 

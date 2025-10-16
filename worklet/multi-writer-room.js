@@ -46,36 +46,40 @@ class MultiWriterRoom extends ReadyResource {
 
     this.base = null
     this.baseLocal = null
+    this.baseLocalKey = null
     this.pairMember = null
   }
 
-  async _open () {
+  async checkResume() {
     await this.store.ready()
+
+    const baseLocal = Autobase.getLocalCore(this.store)
+    this.baseLocal = baseLocal
+    await baseLocal.ready()
+    this.baseLocalKey = baseLocal.key
+
+    const baseLocalLength = baseLocal.length
+    await baseLocal.close()
+
+    return !!baseLocalLength
+  }
+
+  async _open () {
+    const shouldResume = await this.checkResume()
 
     let key
     let encryptionKey
-    if (this.invite) {
-      const baseLocal = Autobase.getLocalCore(this.store)
-      this.baseLocal = baseLocal
-      await baseLocal.ready()
-      const baseLocalKey = baseLocal.key
-      const baseLocalLength = baseLocal.length
-      await baseLocal.close()
-
-      if (!baseLocalLength) {
-        console.log('~ Joining')
-        const res = await new Promise((resolve) => {
-          this.pairing.addCandidate({
-            invite: z32.decode(this.invite),
-            userData: baseLocalKey,
-            onadd: resolve
-          })
+    if (!shouldResume && this.invite) {
+      console.log('~ Joining')
+      const res = await new Promise((resolve) => {
+        this.pairing.addCandidate({
+          invite: z32.decode(this.invite),
+          userData: this.baseLocalKey,
+          onadd: resolve
         })
-        key = res.key
-        encryptionKey = res.encryptionKey
-      } else {
-        console.log('~ Skipped joining')
-      }
+      })
+      key = res.key
+      encryptionKey = res.encryptionKey
     }
 
     this.base = new Autobase(this.store, key, {
