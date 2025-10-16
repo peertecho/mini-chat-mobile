@@ -49,7 +49,7 @@ const useWorklet = () => {
   return {
     ready: (invite) => write('ready', { documentDir: Paths.document.uri.substring('file://'.length), invite }),
     addMessage: (message) => write('add-message', message),
-    reset: () => write('reset'),
+    reset: () => write('reset', Paths.document.uri.substring('file://'.length)),
     clearError: () => setError(''),
     invite,
     messages,

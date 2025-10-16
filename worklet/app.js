@@ -43,6 +43,17 @@ async function onClose () {
 async function onData (obj) {
   if (!obj.data?.noLog) write('log', obj)
 
+  if (obj.tag === 'reset') {
+    write('invite', undefined)
+    const dir = path.join(obj.data, 'mini-chat')
+    if (room) {
+      await room.close()
+      room = undefined
+    }
+    await fs.rm(dir, { recursive: true, force: true })
+    write('invite', '')
+    return
+  }
   if (obj.tag === 'resume') {
     const storage = path.join(obj.data, 'mini-chat', 'storage')
     room = new MiniChatRoom({ storage })
@@ -77,19 +88,18 @@ async function onData (obj) {
   await room.ready()
 
   if (obj.tag === 'get-messages') {
-    const messages = await room.getMessages()
-    write('messages', messages)
-  } else if (obj.tag === 'add-message') {
-    const id = Math.random().toString(16).slice(2)
-    await room.addMessage(id, obj.data, { at: new Date().toISOString() })
-  } else if (obj.tag === 'reset') {
-    write('invite', undefined)
-    const storage = room.storage
-    await room.close()
-    room = undefined
-    await fs.rm(storage, { recursive: true, force: true })
-    write('invite', '')
+    write('messages', await room.getMessages())
+    return
+  } 
+  if (obj.tag === 'add-message') {
+    await room.addMessage(randomId(), obj.data, { at: new Date().toISOString() })
+    return
   }
+  write('error', `Unknown message: ${obj}`)
+}
+
+function randomId () {
+  return Math.random().toString(16).slice(2)
 }
 
 function write (tag, data) {
